@@ -10,6 +10,12 @@ int levelnum=3;
 int[] interval={180,90,1};
 PImage trump;
 boolean speed=false;
+int sets=13;
+int king=12;
+int queen=11;
+int cardtwo=1;
+int pairmaisu=26;
+int ace=0;
 
 int[] vscard={26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51};
 int[] mycard={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};
@@ -34,6 +40,7 @@ int vsnokori=4;
 
 boolean kachimake=false;
 boolean mykachi=false;
+
 
 void setup(){
   titleimg=loadImage("title.png");
@@ -246,25 +253,25 @@ void gamesec(){
   background(128);
   for(int i=0; i<4; i++){
     if(myfuda[i]>=0){
-      PImage tmp=trump.get((myfuda[i]%13)*cardwidth, (myfuda[i]/13)*cardheight, cardwidth+1, cardheight+1);
+      PImage tmp=trump.get((myfuda[i]%sets)*cardwidth, (myfuda[i]/sets)*cardheight, cardwidth+1, cardheight+1);
       image(tmp,150+200*i,550);
     }
   }
   for(int i=0; i<4; i++){
     if(vsfuda[i]>=0){
-      PImage tmp=trump.get((vsfuda[i]%13)*cardwidth, (vsfuda[i]/13)*cardheight, cardwidth+1, cardheight+1);
+      PImage tmp=trump.get((vsfuda[i]%sets)*cardwidth, (vsfuda[i]/sets)*cardheight, cardwidth+1, cardheight+1);
       image(tmp,150+200*i,50);
     }
   }
   for(int i=0; i<2; i++){
-    PImage tmp=trump.get(ba[i]%13*cardwidth, ba[i]/13*cardheight, cardwidth+1, cardheight+1);
+    PImage tmp=trump.get(ba[i]%sets*cardwidth, ba[i]/sets*cardheight, cardwidth+1, cardheight+1);
     image(tmp,250+400*i,300);
   }
   textSize(24);
-  if(vspointer<26){
-    text((26-vspointer+5)+"card(s)",950,50);
+  if(vspointer<pairmaisu){
+    text((pairmaisu-vspointer+5)+"card(s)",950,50);
   }
-  else if(vspointer>=26){
+  else if(vspointer>=pairmaisu){
     int rest=0;
     for(int i=0; i<4; i++){
       if(vsfuda[i]!=-1){
@@ -274,10 +281,10 @@ void gamesec(){
     text((rest)+"card(s)",950,50);
   }
   
-  if(mypointer<26){
-    text(+(26-mypointer+5)+"card(s)",950,550);
+  if(mypointer<pairmaisu){
+    text(+(pairmaisu-mypointer+5)+"card(s)",950,550);
   }
-  else if(mypointer>=26){
+  else if(mypointer>=pairmaisu){
     int rest=0;
     for(int i=0; i<4; i++){
       if(myfuda[i]!=-1){
@@ -310,16 +317,16 @@ void init(){
   mypointer=5;
   vspointer=5;
   for(int i=0; i<shuffle; i++){
-    int from=(int)(Math.random()*26);
-    int to=(int) (Math.random()*26);
+    int from=(int)(Math.random()*pairmaisu);
+    int to=(int) (Math.random()*pairmaisu);
     int tmp=mycard[to];
     mycard[to]=mycard[from];
     mycard[from]=tmp;
   }
   
   for(int i=0; i<shuffle; i++){
-    int from=(int)(Math.random()*26);
-    int to=(int) (Math.random()*26);
+    int from=(int)(Math.random()*pairmaisu);
+    int to=(int) (Math.random()*pairmaisu);
     int tmp=vscard[to];
     vscard[to]=vscard[from];
     vscard[from]=tmp;
@@ -345,24 +352,24 @@ void AI(){  //AI is zenkyo, therefore AI can see 4 cards at a one time.
   for(int i=0; i<4; i++){
     if(vsfuda[i]!=-1){
       for(int j=0; j<2; j++){  //ba
-        if(vsfuda[i]%13 != 0 && vsfuda[i]%13 !=12){  //K to A or A to K no handan
-          if(Math.abs(ba[j]%13-vsfuda[i]%13)==1){  //okeru
+        if(vsfuda[i]%sets != ace && vsfuda[i]%sets != king){  //K to A or A to K no handan
+          if(Math.abs(ba[j]%sets-vsfuda[i]%sets)==1){  //okeru
             if(okeru==-1){  // hasn't oku?
               okeru=i;
               okuba=j;
             }
           }
         }
-        else if(vsfuda[i]%13==0){
-          if(ba[j]%13==12 || ba[j]%13==1){
+        else if(vsfuda[i]%sets==ace){
+          if(ba[j]%sets==king || ba[j]%sets==cardtwo){
             if(okeru==-1){
               okeru=i;
               okuba=j;
             }
           }
         }
-        else if(vsfuda[i]%13==12){
-          if(ba[j]%13==0 || ba[j]%13==11){
+        else if(vsfuda[i]%sets==king){
+          if(ba[j]%sets==ace || ba[j]%sets==queen){
             if(okeru==-1){
               okeru=i;
               okuba=j;
@@ -374,11 +381,11 @@ void AI(){  //AI is zenkyo, therefore AI can see 4 cards at a one time.
   }
   if(okeru!=-1){
     ba[okuba]=vsfuda[okeru];
-    if(vspointer<26){
+    if(vspointer<pairmaisu){
       vsfuda[okeru]=vscard[vspointer];
       vspointer++;
     }
-    else if(vspointer>=26){
+    else if(vspointer>=pairmaisu){
       vsfuda[okeru]=-1;
     }
   }
@@ -387,22 +394,22 @@ void AI(){  //AI is zenkyo, therefore AI can see 4 cards at a one time.
 void sousa(int num){
   if(myfuda[num%4]!=-1){
     int okuba=-1;
-      if(myfuda[num%4]%13!=0 && myfuda[num%4]%13!=12){
-        if(Math.abs(ba[num/4]%13-myfuda[num%4]%13)==1){  //okeru
+      if(myfuda[num%4]%sets != ace && myfuda[num%4]%sets != king){
+        if(Math.abs(ba[num/4]%sets-myfuda[num%4]%sets)==1){  //okeru
           if(okuba==-1){  // hasn't oku?
             okuba=num/4;
           }
         }
       }
-      else if(myfuda[num%4]%13==0){
-        if(ba[num/4]%13==12 || ba[num/4]%13==1){
+      else if(myfuda[num%4]%sets==ace){
+        if(ba[num/4]%sets==king || ba[num/4]%sets==cardtwo){
           if(okuba==-1){
             okuba=num/4;
           }
         }
       }
-      else if(myfuda[num%4]%13==12){
-        if(ba[num/4]%13==0 || ba[num/4]%13==11){
+      else if(myfuda[num%4]%sets==king){
+        if(ba[num/4]%sets==ace || ba[num/4]%sets==queen){
           if(okuba==-1){
             okuba=num/4;
           }
@@ -410,11 +417,11 @@ void sousa(int num){
       }
     if(okuba!=-1){
       ba[okuba]=myfuda[num%4];
-      if(mypointer<26){
+      if(mypointer<pairmaisu){
         myfuda[num%4]=mycard[mypointer];
         mypointer++;
       }
-      else if(mypointer>=26){
+      else if(mypointer>=pairmaisu){
         myfuda[num%4]=-1;
       }
     }
@@ -427,18 +434,18 @@ boolean istezumari(){
   for(int i=0; i<4; i++){
     if(vsfuda[i]!=-1){
       for(int j=0; j<2; j++){  //ba
-        if(vsfuda[i]%13 != 0 && vsfuda[i]%13 !=12){  //K to A or A to K no handan
-          if(Math.abs(ba[j]%13-vsfuda[i]%13)==1){  //okeru
+        if(vsfuda[i]%sets != ace && vsfuda[i]%sets != king){  //K to A or A to K no handan
+          if(Math.abs(ba[j]%sets-vsfuda[i]%sets)==1){  //okeru
             tezumari=true;
           }
         }
-        else if(vsfuda[i]%13==0){
-          if(ba[j]%13==12 || ba[j]%13==1){
+        else if(vsfuda[i]%sets==ace){
+          if(ba[j]%sets==king || ba[j]%sets==cardtwo){
             tezumari=true;
           }
         }
-        else if(vsfuda[i]%13==12){
-          if(ba[j]%13==0 || ba[j]%13==11){
+        else if(vsfuda[i]%sets==king){
+          if(ba[j]%sets==ace || ba[j]%sets==queen){
             tezumari=true;
           }
         }
@@ -447,18 +454,18 @@ boolean istezumari(){
     
     if(myfuda[i]!=-1){
       for(int j=0; j<2; j++){  //ba
-        if(myfuda[i]%13 != 0 && myfuda[i]%13 !=12){  //K to A or A to K no handan
-          if(Math.abs(ba[j]%13-myfuda[i]%13)==1){  //okeru
+        if(myfuda[i]%sets != ace && myfuda[i]%sets != king){  //K to A or A to K no handan
+          if(Math.abs(ba[j]%sets-myfuda[i]%sets)==1){  //okeru
             tezumari=true;
           }
         }
-        else if(myfuda[i]%13==0){
-          if(ba[j]%13==12 || ba[j]%13==1){
+        else if(myfuda[i]%sets==ace){
+          if(ba[j]%sets==king || ba[j]%sets==cardtwo){
             tezumari=true;
           }
         }
-        else if(myfuda[i]%13==12){
-          if(ba[j]%13==0 || ba[j]%13==11){
+        else if(myfuda[i]%sets==king){
+          if(ba[j]%sets==ace || ba[j]%sets==queen){
             tezumari=true;
           }
         }
@@ -473,7 +480,7 @@ void speed(int num){
   
   if(!kachimake){ // kachimake has't detected
     if(!fudanull){
-      if(mypointer<26){
+      if(mypointer<pairmaisu){
         ba[0]=mycard[mypointer];
         mypointer++;
       }
@@ -482,7 +489,7 @@ void speed(int num){
         myfuda[num]=-1;
       }
       
-      if(vspointer<26){
+      if(vspointer<pairmaisu){
         ba[1]=vscard[vspointer];
         vspointer++;
       }
@@ -514,7 +521,7 @@ void speed(int num){
 
 void kachimake(){
   //kachi make no handan
-  if(mypointer>=26 || vspointer>=26){
+  if(mypointer>=pairmaisu || vspointer>=pairmaisu){
     mynokori=4;
     vsnokori=4;
     for(int i=0; i<4; i++){
